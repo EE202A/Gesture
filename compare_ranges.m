@@ -10,6 +10,9 @@ end
 if ~isvector(t1) || ~isvector(t2)
     error('input time stamps must be vector')
 end
+if length(t1) ~= length(x1) || length(t2) ~= length(x2)
+    error('timestamps and signal dont match')
+end
 % linear interpolation
 x12 = interp1(t1, x1, t2);
 % euclidean distance between 2 signals

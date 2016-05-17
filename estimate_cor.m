@@ -1,7 +1,7 @@
 function [ y ] = estimate_cor( delta_rin, id, start )
 % given a set of range measurements, reconstruct the 3d coordinate
 %   input: delta_rin -- the serial range measurements, vector
-%               id   -- the node pointed to, 0-8
+%               id   -- the node pointed to, 0-7
 %              start -- the initial localization point
 %   output: y -- result N by 3 coordinates
 global anchors

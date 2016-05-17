@@ -17,7 +17,7 @@ if n < 20       % less than 2sec mearsurement, discard it
 end
 
 % this threshold makes sense in our case
-th = -0.3; 
+th = -0.4; 
 th_min = -0;
 th_t = 5;
 
@@ -30,7 +30,7 @@ offset = mean(signal(1:10));
 delta_y = y(3:end) - offset;
 % y2 = y1 .^ 2;
 shift = 2;      % left shift from the original sample
-
+n = n - shift;
 
 % the first significant move...
 idx = find(delta_y < th, 1 );
@@ -39,7 +39,16 @@ if isempty(idx)
 end
 prev = delta_y(1:idx);
 left = find(prev > th_min, 1, 'last' );
-right = min(idx -left + idx, n - shift);
+% omit the case if this is not the "first significant valley"
+if mean(delta_y(1:left)) > abs(th)*2/3
+    return 
+end
+
+% explore to the valley
+while idx < n && delta_y(idx) > delta_y(idx + 1)
+    idx = idx + 1;
+end
+right = min(idx -left + idx, n);
 if right - left < th_t
     return 
 end
