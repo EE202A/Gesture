@@ -1,9 +1,21 @@
 close all
 clear all
-ranges = load('ranges');
-posix_time = load('posix_time');
-ranges = ranges.ranges;
-posix_time = posix_time.posix_time;
+if exist('ranges.mat', 'file') == 2
+    ranges = load('ranges');
+    ranges = ranges.ranges;
+end
+if exist('posix_time.mat', 'file') == 2
+    posix_time = load('posix_time');
+    posix_time = posix_time.posix_time;
+end
+if exist('mocap.mat', 'file') == 2
+    mocap = load('mocap');
+    mocap = mocap.mocap;
+end
+if exist('offset.mat', 'file') == 2
+    offset = load('offset');
+    offset = offset.offset;
+end
 % 8 * 3 matrix, [x y z] from Alpha to Hotel, in meters
 global anchors
 anchors = [
@@ -17,13 +29,14 @@ anchors = [
         -3.282, 0.738, 4.009        
 ];
 
-% %% generate ranges measurement
+% %% load ranges measurement
 % labels = 0:7;
 % ranges = cell(8,8);
+% mocap = cell(8,1);
 % posix_time = cell(8,8);
 % for i = labels
-%     mocap = load(['mocap', num2str(i), '.csv']);
-%     ntb = load(['ntbtiming',num2str(i), '.csv']);
+%     mocap{i + 1} = load(['data1/mocap', num2str(i), '.csv']);
+%     ntb = load(['data1/ntbtiming',num2str(i), '.csv']);
 %     timestamps = ntb(:,1);
 %     recv_ids = ntb(:,3);
 %     figure(i + 1)
@@ -45,10 +58,10 @@ anchors = [
 %     legend('0', '1', '2', '3', '4', '5', '6', '7')
 % end
 % save('ranges', 'ranges')  
-% save ('posix_time', 'posix_time')
+% save('posix_time', 'posix_time')
+% save('mocap', 'mocap')
 
-
-%% save the 8 anchor nodes' coordinate
+%% compare mocap and thereotical generates
 
 % % load data from mocap files and generate theoretical ranges
 % mocap = cell(8,1);
@@ -75,14 +88,14 @@ anchors = [
 %     end
 %     offset(j + 1) = mean(a);
 % end
-% save offset
+% save('offset', 'offset')
 
 %% ranging experiment
 found = cell(8,1);
 found_id = cell(8,1);
 for i = 1:8
     f = [];
-    found_id{i} = {};
+    found_id{i} = [];
     for j = 1:8
        [ids, stroke] = find_first_valley(ranges{i,j});
        if isempty(ids)
@@ -90,24 +103,25 @@ for i = 1:8
        else
            f = [f j - 1];   % the actual node index
            %found_id{i} = [found_id{i}, {ids, stroke}];
-           start = localization(ranges{i,:}, offset);
+%            start = localization(ranges{i,:}, offset);
+           % using mocap data
+           start = mean(mocap{i}(1:10,3:5),1);
            cors = estimate_cor(stroke, j - 1, start);
            th_ranges = theoretical_ranges(cors);
-           scores = zeros(8,1);
            t = posix_time{i,j}(ids);
-           score = []
+           scores = [];
            for k = 1:8
                 if isempty(posix_time{i,k}) % no measurements
                     continue
                 end
-                [beg, en] = find_slot(t(1), t(en), posix_time{i,k});
+                [beg, en] = find_slot(t(1), t(end), posix_time{i,k});
                 if beg == -1    % no corresponding time measurement
                     continue
                 end
-                scores = [score, compare_ranges(t, th_ranges(:,k), ...
-                            posix_time{i,k}(beg:en), ranges{i,k}(beg:en))];
+                scores = [scores, compare_ranges(t, th_ranges(:,k), ...
+                            posix_time{i,k}(beg:en), ranges{i,k}(beg:en) - offset(k))];
            end
-           found_id{i} = [found_id{i}, {mean(score), var(score)}];
+           found_id{i} = [found_id{i}, [mean(scores); var(scores)]];
        end
     end
     found{i} = f;
