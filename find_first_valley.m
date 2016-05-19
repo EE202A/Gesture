@@ -1,7 +1,7 @@
 function [ ids, stroke ] = find_first_valley( signal )
 %find the first valley in the ranging signal 
 %   input: ranging signal vector 
-%   output: the ids and the "valuable" output signal, empty matrix if not
+%   output: the ids and the "relevant" output signal, empty matrix if not
 %   found
 [n, m] = size(signal);
 ids = [];
@@ -17,7 +17,7 @@ if n < 20       % less than 2sec mearsurement, discard it
 end
 
 % this threshold makes sense in our case
-th = -0.4; 
+th = -0.33; 
 th_min = -0;
 th_t = 5;
 
@@ -37,8 +37,19 @@ idx = find(delta_y < th, 1 );
 if isempty(idx)
     return
 end
-prev = delta_y(1:idx);
-left = find(prev > th_min, 1, 'last' );
+% prev = delta_y(1:idx);
+% find left turning point
+left = idx - 1;
+while left > 0 && delta_y(left) > delta_y(left + 1) && delta_y(left) < th_min
+    left = left - 1;
+end
+
+% rule out the case if this is not the first valley point
+if min(delta_y(1:left)) < th / 2 && left >= 20
+    return 
+end
+
+% left = find(prev >= th_min, 1, 'last' );
 % omit the case if this is not the "first significant valley"
 if mean(delta_y(1:left)) > abs(th)*2/3
     return 
@@ -53,5 +64,5 @@ if right - left < th_t
     return 
 end
 ids = (left: right) + shift;            % right shift back
-stroke = delta_y(left:right);
+stroke = signal(ids);
 

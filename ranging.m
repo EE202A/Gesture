@@ -1,21 +1,13 @@
 close all
 clear all
-if exist('ranges.mat', 'file') == 2
-    ranges = load('ranges');
-    ranges = ranges.ranges;
-end
-if exist('posix_time.mat', 'file') == 2
-    posix_time = load('posix_time');
-    posix_time = posix_time.posix_time;
-end
-if exist('mocap.mat', 'file') == 2
-    mocap = load('mocap');
-    mocap = mocap.mocap;
-end
-if exist('offset.mat', 'file') == 2
-    offset = load('offset');
-    offset = offset.offset;
-end
+% if exist('ranges.mat', 'file') == 2
+%     ranges = load('ranges');
+%     ranges = ranges.ranges;
+% end
+% if exist('posix_time.mat', 'file') == 2
+%     posix_time = load('posix_time');
+%     posix_time = posix_time.posix_time;
+% end
 % 8 * 3 matrix, [x y z] from Alpha to Hotel, in meters
 global anchors
 anchors = [
@@ -29,39 +21,17 @@ anchors = [
         -3.282, 0.738, 4.009        
 ];
 
-% %% load ranges measurement
-% labels = 0:7;
-% ranges = cell(8,8);
-% mocap = cell(8,1);
-% posix_time = cell(8,8);
-% for i = labels
-%     mocap{i + 1} = load(['data1/mocap', num2str(i), '.csv']);
-%     ntb = load(['data1/ntbtiming',num2str(i), '.csv']);
-%     timestamps = ntb(:,1);
-%     recv_ids = ntb(:,3);
-%     figure(i + 1)
-%     for j = 0:7
-%         logic = (recv_ids == j);
-%         if sum(logic) == 0
-%             display([num2str(i), ' missing node ', num2str(j)])
-%         end
-%         posix_t = timestamps(logic);
-%         times = ntb(logic, 5:10);
-%         [range, mask] = calc_ranging(times);
-%         range = range(mask);
-%         posix_t = posix_t(mask);
-%         plot(posix_t, range)
-%         ranges{i + 1, j + 1} = range;
-%         posix_time{i + 1, j + 1} = posix_t;
-%         hold on
-%     end
-%     legend('0', '1', '2', '3', '4', '5', '6', '7')
-% end
-% save('ranges', 'ranges')  
-% save('posix_time', 'posix_time')
-% save('mocap', 'mocap')
-
-%% compare mocap and thereotical generates
+%% load data from data folder
+% load ntb data
+mode1 = 1;
+mode2 = {'data2/ntb_','s',1};
+[ranges, posix_time] = load_ntbdata(mode1, 1);
+% load mocap data
+if exist('mocap.mat', 'file') == 2
+    mocap = load('mocap');
+    mocap = mocap.mocap;
+end
+%% compare mocap and thereotical generates, calculate offset
 
 % % load data from mocap files and generate theoretical ranges
 % mocap = cell(8,1);
@@ -103,7 +73,13 @@ for i = 1:8
        else
            f = [f j - 1];   % the actual node index
            %found_id{i} = [found_id{i}, {ids, stroke}];
-%            start = localization(ranges{i,:}, offset);
+           
+%            % using tianrui zhang big god's algo
+%            param = cell(8,1);
+%            for ii = 1:8
+%             param{ii} = ranges{i,ii};
+%            end
+%            start = localization(param);
            % using mocap data
            start = mean(mocap{i}(1:10,3:5),1);
            cors = estimate_cor(stroke, j - 1, start);
@@ -119,7 +95,7 @@ for i = 1:8
                     continue
                 end
                 scores = [scores, compare_ranges(t, th_ranges(:,k), ...
-                            posix_time{i,k}(beg:en), ranges{i,k}(beg:en) - offset(k))];
+                            posix_time{i,k}(beg:en), ranges{i,k}(beg:en))];
            end
            found_id{i} = [found_id{i}, [mean(scores); var(scores)]];
        end
@@ -127,4 +103,22 @@ for i = 1:8
     found{i} = f;
     
 end
+
+%% Evaluation 
+accur_mean = zeros(8,1);
+accur_std = zeros(8,1);
+accur_synth = zeros(8,1);
+for i = 1:8
+    [tmp, id_mean] = min(found_id{i}(1,:));
+    [tmp, id_std] = min(found_id{i}(2,:));
+%     [tmp, id_synth] = 
+    % eval by mean
+    accur_mean(i) =  (i - 1 == found{i}(id_mean));
+    accur_std(i) =  (i - 1 == found{i}(id_std));
+end
+display(accur_mean)
+display(accur_std)
+
+
+
 
