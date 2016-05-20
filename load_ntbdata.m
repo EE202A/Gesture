@@ -17,6 +17,8 @@ for i = labels
 %     mocap{i + 1} = load(['data1/mocap', num2str(i), '.csv']);
     if mode == 1
         filename = ['data1/ntbtiming', num2str(i), '.csv'];
+    elseif mode == 2
+        filename = ['ntb', num2str(i), '.csv'];
     else 
         filename = [mode{1}, num2str(i), '_', mode{2}, '_', num2str(mode{3}), '.csv'];
     end

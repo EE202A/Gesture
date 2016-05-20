@@ -23,8 +23,8 @@ anchors = [
 
 %% load data from data folder
 % load ntb data
-mode1 = 1;
-mode2 = {'data2/ntb_','s',1};
+mode1 = 2;
+mode2 = {'ntb','s',1};
 [ranges, posix_time] = load_ntbdata(mode1, 1);
 % load mocap data
 if exist('mocap.mat', 'file') == 2
@@ -33,32 +33,32 @@ if exist('mocap.mat', 'file') == 2
 end
 %% compare mocap and thereotical generates, calculate offset
 
-% % load data from mocap files and generate theoretical ranges
-% mocap = cell(8,1);
-% % timestamps and ranges
-% th_ranges = cell(8,2);
-% 
-% for i = 0:7
-%     mocap{i + 1} = load(['mocap', num2str(i), '.csv']);
-%     th_ranges{i + 1,1} = mocap{i + 1}(:,1);    % save timestamp
-%     th_ranges{i + 1,2} = theoretical_ranges(mocap{i + 1}(:,3:5));  % save ranges
-% end
-% % load the time and ranges from the measured ntb units
-% 
-% %% calculate the offset of each anchor node, assumed to be constant for each
-% offset = zeros(8,1);
-% j = 1;
-% for j = 0:7
-%     a = [];
-%     for i = 1:8
-%         if isempty(ranges{i, j + 1})
-%             continue
-%         end
-%         a = [a mean(ranges{i, j + 1}) - mean(th_ranges{i,2}(:,j + 1))];
-%     end
-%     offset(j + 1) = mean(a);
-% end
-% save('offset', 'offset')
+% load data from mocap files and generate theoretical ranges
+mocap = cell(8,1);
+% timestamps and ranges
+th_ranges = cell(8,2);
+
+for i = 0:7
+    mocap{i + 1} = load(['mocap', num2str(i), '.csv']);
+    th_ranges{i + 1,1} = mocap{i + 1}(:,1);    % save timestamp
+    th_ranges{i + 1,2} = theoretical_ranges(mocap{i + 1}(:,3:5));  % save ranges
+end
+% load the time and ranges from the measured ntb units
+
+%% calculate the offset of each anchor node, assumed to be constant for each
+offset = zeros(8,1);
+j = 1;
+for j = 0:7
+    a = [];
+    for i = 1:8
+        if isempty(ranges{i, j + 1})
+            continue
+        end
+        a = [a mean(ranges{i, j + 1}) - mean(th_ranges{i,2}(:,j + 1))];
+    end
+    offset(j + 1) = mean(a);
+end
+save('offset', 'offset')
 
 %% ranging experiment
 found = cell(8,1);
@@ -109,6 +109,11 @@ accur_mean = zeros(8,1);
 accur_std = zeros(8,1);
 accur_synth = zeros(8,1);
 for i = 1:8
+    if isempty(found{i})
+        accur_mean(i) = 0;
+        accur_std(i) = 0;
+        continue
+    end
     [tmp, id_mean] = min(found_id{i}(1,:));
     [tmp, id_std] = min(found_id{i}(2,:));
 %     [tmp, id_synth] = 
