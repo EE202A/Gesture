@@ -23,7 +23,7 @@ anchors = [
 
 %% load data from data folder
 % load data, mode = 3,4
-mode = 3;
+mode = 2;
 [ranges, posix_time, offset] = load_ntbdata(mode, 1);
 mocap = load_mocapdata(mode);    
 
