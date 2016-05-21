@@ -24,14 +24,17 @@ anchors = [
 %% load data from data folder
 % load ntb data
 mode1 = 1;
-mode2 = {'data2/ntb_','s',1};
-[ranges, posix_time] = load_ntbdata(mode1, 1);
+mode2 = 2;
+mode3 = 3;
+mode4 = 4;
+[ranges, posix_time, offset] = load_ntbdata(mode4, 1);
 % load mocap data
-if exist('mocap.mat', 'file') == 2
-    mocap = load('mocap');
-    mocap = mocap.mocap;
-end
-%% compare mocap and thereotical generates, calculate offset
+mocap = load_mocapdata(mode3);    
+% if exist('mocap.mat', 'file') == 2
+%     mocap = load('mocap');
+%     mocap = mocap.mocap;
+% end
+%% compare mocap and thereotical generates, calculate offset -- depreciated now
 
 % % load data from mocap files and generate theoretical ranges
 % mocap = cell(8,1);
@@ -109,6 +112,11 @@ accur_mean = zeros(8,1);
 accur_std = zeros(8,1);
 accur_synth = zeros(8,1);
 for i = 1:8
+    if isempty(found{i})
+        accur_mean(i) = 0;
+        accur_std = 0;
+        continue
+    end
     [tmp, id_mean] = min(found_id{i}(1,:));
     [tmp, id_std] = min(found_id{i}(2,:));
 %     [tmp, id_synth] = 

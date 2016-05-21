@@ -44,10 +44,10 @@ while left > 0 && delta_y(left) > delta_y(left + 1) && delta_y(left) < th_min
     left = left - 1;
 end
 
-% rule out the case if this is not the first valley point
-if min(delta_y(1:left)) < th / 2 && left >= 20
-    return 
-end
+% % rule out the case if this is not the first valley point
+% if min(delta_y(1:left)) < th / 2 && left >= 20
+%     return 
+% end
 
 % left = find(prev >= th_min, 1, 'last' );
 % omit the case if this is not the "first significant valley"
