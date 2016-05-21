@@ -22,9 +22,7 @@ th_min = -0;
 th_t = 5;
 
 % moving average filter 
-b = [1/3, 1/3, 1/3];
-a = 1;
-y = filter(b,a,signal);
+y = mov_avg_filter(signal);
 % estimate offset
 offset = mean(signal(1:10));
 delta_y = y(3:end) - offset;
@@ -63,6 +61,10 @@ right = min(idx -left + idx, n);
 if right - left < th_t
     return 
 end
-ids = (left: right) + shift;            % right shift back
-stroke = signal(ids);
+% avoid going to the end, causing time mismatch
+if right - left > 15 && right == n
+    right = right - 5;
+end
+ids = (left: right) + shift;        % right shift back
+stroke = y(ids);        % output smoothed signal
 

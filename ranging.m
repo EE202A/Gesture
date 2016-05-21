@@ -22,46 +22,11 @@ anchors = [
 ];
 
 %% load data from data folder
-% load ntb data
-mode1 = 1;
-mode2 = 2;
-mode3 = 3;
-mode4 = 4;
-[ranges, posix_time, offset] = load_ntbdata(mode4, 1);
-% load mocap data
-mocap = load_mocapdata(mode3);    
-% if exist('mocap.mat', 'file') == 2
-%     mocap = load('mocap');
-%     mocap = mocap.mocap;
-% end
-%% compare mocap and thereotical generates, calculate offset -- depreciated now
+% load data, mode = 3,4
+mode = 3;
+[ranges, posix_time, offset] = load_ntbdata(mode, 1);
+mocap = load_mocapdata(mode);    
 
-% % load data from mocap files and generate theoretical ranges
-% mocap = cell(8,1);
-% % timestamps and ranges
-% th_ranges = cell(8,2);
-% 
-% for i = 0:7
-%     mocap{i + 1} = load(['mocap', num2str(i), '.csv']);
-%     th_ranges{i + 1,1} = mocap{i + 1}(:,1);    % save timestamp
-%     th_ranges{i + 1,2} = theoretical_ranges(mocap{i + 1}(:,3:5));  % save ranges
-% end
-% % load the time and ranges from the measured ntb units
-% 
-% %% calculate the offset of each anchor node, assumed to be constant for each
-% offset = zeros(8,1);
-% j = 1;
-% for j = 0:7
-%     a = [];
-%     for i = 1:8
-%         if isempty(ranges{i, j + 1})
-%             continue
-%         end
-%         a = [a mean(ranges{i, j + 1}) - mean(th_ranges{i,2}(:,j + 1))];
-%     end
-%     offset(j + 1) = mean(a);
-% end
-% save('offset', 'offset')
 
 %% ranging experiment
 found = cell(8,1);
@@ -97,8 +62,9 @@ for i = 1:8
                 if beg == -1    % no corresponding time measurement
                     continue
                 end
+                rr = mov_avg_filter(ranges{i,k});
                 scores = [scores, compare_ranges(t, th_ranges(:,k), ...
-                            posix_time{i,k}(beg:en), ranges{i,k}(beg:en))];
+                            posix_time{i,k}(beg:en), rr(beg:en))];
            end
            found_id{i} = [found_id{i}, [mean(scores); var(scores)]];
        end
@@ -114,7 +80,7 @@ accur_synth = zeros(8,1);
 for i = 1:8
     if isempty(found{i})
         accur_mean(i) = 0;
-        accur_std = 0;
+        accur_std(i) = 0;
         continue
     end
     [tmp, id_mean] = min(found_id{i}(1,:));
@@ -124,8 +90,8 @@ for i = 1:8
     accur_mean(i) =  (i - 1 == found{i}(id_mean));
     accur_std(i) =  (i - 1 == found{i}(id_std));
 end
-display(accur_mean)
-display(accur_std)
+display(accur_mean')
+display(accur_std')
 
 
 

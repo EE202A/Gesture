@@ -1,6 +1,8 @@
 function [ ranges, posix_time, offset] = load_ntbdata( mode, display)
 %UNTITLED11 Summary of this function goes here
 %   Detailed explanation goes here
+
+%% calculate offset
 if exist('offset.mat', 'file') == 2
     offset = load('offset');
     offset = offset.offset;
@@ -80,6 +82,39 @@ for i = labels
     end
     legend('0', '1', '2', '3', '4', '5', '6', '7')
 end
+
+% if exist('mocap.mat', 'file') == 2
+%     mocap = load('mocap');
+%     mocap = mocap.mocap;
+% end
+% %% compare mocap and thereotical generates, calculate offset -- depreciated now
+% 
+% % load data from mocap files and generate theoretical ranges
+% mocap = cell(8,1);
+% % timestamps and ranges
+% th_ranges = cell(8,2);
+% 
+% for i = 0:7
+%     mocap{i + 1} = load(['mocap', num2str(i), '.csv']);
+%     th_ranges{i + 1,1} = mocap{i + 1}(:,1);    % save timestamp
+%     th_ranges{i + 1,2} = theoretical_ranges(mocap{i + 1}(:,3:5));  % save ranges
+% end
+% load the time and ranges from the measured ntb units
+
+% %% calculate the offset of each anchor node, assumed to be constant for each
+% offset = zeros(8,1);
+% j = 1;
+% for j = 0:7
+%     a = [];
+%     for i = 1:8
+%         if isempty(ranges{i, j + 1})
+%             continue
+%         end
+%         a = [a mean(ranges{i, j + 1}) - mean(th_ranges{i,2}(:,j + 1))];
+%     end
+%     offset(j + 1) = mean(a);
+% end
+% save('offset', 'offset')
 % save('ranges', 'ranges')  
 % save('posix_time', 'posix_time')
 % save('mocap', 'mocap')

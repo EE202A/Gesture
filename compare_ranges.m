@@ -5,12 +5,6 @@ function [ y ] = compare_ranges( t1, x1, t2, x2)
 %          x1, x2 -- raw input signal vector, may be different size
 %           y     -- comparing score between 2 signals
 
-% moving average filter 
-b = [1/3, 1/3, 1/3];
-a = 1;
-x1 = filter(b,a,x1);
-x2 = filter(b,a,x2);
-
 if ~isvector(x1) || ~isvector(x2)
     error('input signal must be vector')
 end
