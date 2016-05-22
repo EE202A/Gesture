@@ -24,7 +24,7 @@ anchors = [
 %% load data from data folder
 % load data, mode = 3,4
 mode = 2;
-[ranges, posix_time, offset] = load_ntbdata(mode, 1);
+[ranges, posix_time, offset] = load_ntbdata(mode, 0);
 mocap = load_mocapdata(mode);    
 
 
@@ -74,24 +74,34 @@ for i = 1:8
 end
 
 %% Evaluation 
-accur_mean = zeros(8,1);
-accur_std = zeros(8,1);
-accur_synth = zeros(8,1);
+% performance metrics, the estimated pointing node and the "trust score"
+performance = zeros(8,2);
+% accur_std = zeros(8,2);
+% accur_synth = zeros(8,2);
 for i = 1:8
     if isempty(found{i})
-        accur_mean(i) = 0;
-        accur_std(i) = 0;
+        performance(i) = [-1 -1];
+%         accur_std(i) = 0;
         continue
     end
-    [tmp, id_mean] = min(found_id{i}(1,:));
-    [tmp, id_std] = min(found_id{i}(2,:));
-%     [tmp, id_synth] = 
-    % eval by mean
-    accur_mean(i) =  (i - 1 == found{i}(id_mean));
-    accur_std(i) =  (i - 1 == found{i}(id_std));
+    % evaluation metrics -- f([mean], [std])
+    eval = found_id{i}(1,:) + found_id{i}(2,:);
+    [~, id_mean] = min(eval);
+%     [tmp, id_std] = min(found_id{i}(2,:));
+    % trust score calculation -- compare with second largest element 
+    tmp = sort(eval);
+    if length(tmp) > 1
+        score = tmp(1) / tmp(2);
+    else
+        score = 0;
+    end
+%     accur_mean(i) =  [(i - 1 == found{i}(id_mean)) ];
+%     accur_std(i) =  (i - 1 == found{i}(id_std));
+    performance(i,:) = [found{i}(id_mean), score];
 end
-display(accur_mean')
-display(accur_std')
+display(performance')
+
+% display(accur_std')
 
 
 

@@ -1,4 +1,6 @@
-function [angles]=yingnandick(mode)
+%% caculate the "pointing vector" from mocap data
+% data2 folder
+mode = 2;
 anchors = [
         -3.817, 2.416, 2.296;
         1.062, 2.381, 2.308;
@@ -40,5 +42,7 @@ for i = 1:8
         tem(i) =0;
     end
 end
+% the correctness of each vector -- is it pointing at the right node?
 display(tem);
-end
+% Angle in degree
+display(angles)

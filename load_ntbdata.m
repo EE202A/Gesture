@@ -82,7 +82,9 @@ for i = labels
             hold on
         end
     end
-    legend('0', '1', '2', '3', '4', '5', '6', '7')
+    if display
+        legend('0', '1', '2', '3', '4', '5', '6', '7')
+    end
 end
 
 % if exist('mocap.mat', 'file') == 2
