@@ -6,6 +6,7 @@ en = -1;
 if T(1) > t1 || T(end) < t2
     return 
 end
+%find when valley begin, the time at the anchor node
 beg = find(T <= t1, 1, 'last');
 en = find(T >= t2, 1);
 

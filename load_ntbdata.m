@@ -1,41 +1,66 @@
 function [ ranges, posix_time, offset] = load_ntbdata( mode, display)
-%UNTITLED11 Summary of this function goes here
-%   Detailed explanation goes here
+%load offsets for each anchor node and ntb and mocap data
+%
+%INPUT  mode:       We get 3 sets of test data. Use mode to select different
+%                   input data
+%       display:    if 1 display the plot of distance changes of each anchor
+%                   node.
+%
+%OUTPUT  ranges:    The range distance from 8 anchor node when user point to diff anchor
+%                   The cell's first indx is the anchor user point to
+%                   calibrated by substruct the offset
+%       posix_time: The time stamp of of each ranging event corresponding to
+%                   the above ranges
+%       offset:     The calibrated offsets for each anchor node 
+
 
 %% calculate offset
+% fetch offset from cache
 if exist('offset.mat', 'file') == 2
     offset = load('offset');
     offset = offset.offset;
+%calc the offset
+%calibrate the data base on the mocap data and ntb data at a fixed point
 elseif exist('offset/ntb_offset.csv', 'file') == 2 ...
         && exist('offset/mocap_offset.csv', 'file') == 2
     ntb = load('offset/ntb_offset.csv');
     mocap = load('offset/mocap_offset.csv');
-    timestamps = ntb(:,1);
-    recv_ids = ntb(:,3);
-    rs = cell(8,1);
+    
+    %get the practice range from ntb
+    recv_ids = ntb(:,3);    %get anchor id
+    rs = cell(8,1);         
     for i = 0:7
+        %get mask for extract data for each node in the ntb data file
         logic = (recv_ids == i);
         if sum(logic) == 0
-%             display([num2str(i), ' missing node ', num2str(j)])
-%             display('missing node')
-            ['offset missing node ', num2str(i)]
+           disp(['offset missing node ', num2str(i)])
         end
-        posix_t = timestamps(logic);
+        
+        %get the time measure by the anchor node
         times = ntb(logic, 5:10);
+        %calc the distance using the time info base on the formula
+        %return the distance from the anchor node
+        %mask is to only extract the distance under than 10m
         [range, mask] = calc_ranging(times);
         range = range(mask);
-        % remove the offset calibrated from mocap data
+        
+        %save the range
         rs{i + 1} = range;
     end
+    
+    %get the theoretical ranges from mocap
     offset = zeros(8,1);
     th_ranges = theoretical_ranges(mocap(:,3:5));
+    
+    %get the difference between actual value and theoretical value as the
+    %offsets
     for j = 0:7
         offset(j + 1) = mean(rs{j + 1}) - mean(th_ranges(:,j + 1));
     end
-    save('offset', 'offset')
+    save('./offset', 'offset')
 
 else
-    error('no fucking offset data')
+    error('No offset data')
 end
 
 %% load ranges measurement
@@ -43,50 +68,62 @@ labels = 0:7;
 ranges = cell(8,8);
 posix_time = cell(8,8);
 
+% this label is the anchor node the user point to
 for i = labels
-%     mocap{i + 1} = load(['data1/mocap', num2str(i), '.csv']);
     if mode == 1
         filename = ['data1/ntbtiming', num2str(i), '.csv'];
     elseif mode == 2
         filename = ['data2/ntb', num2str(i), '.csv'];
     elseif mode == 3
         filename = ['data3/ntb', num2str(i), '.csv'];
-%     elseif mode == 4
-%         filename = ['data4/ntb', num2str(i), '.csv'];
     else
-        error('no such dataset')
+        error('no ntb ranges dataset')
     end
+    
+    
     ntb = load(filename);
     timestamps = ntb(:,1);
     recv_ids = ntb(:,3);
+    
     if display
         figure(i + 1)
     end
+    
+    %this is when user point to anchor i, all 8 node has receive data
     for j = 0:7
+        %only extract the data from anchor node j of user point to i
         logic = (recv_ids == j);
         if sum(logic) == 0
-%             display([num2str(i), ' missing node ', num2str(j)])
-%             display('missing node')
-            [num2str(i), ' missing node ', num2str(j)]
+            disp([num2str(i), ' missing node ', num2str(j)])
         end
-        posix_t = timestamps(logic);
+        
+        % calc the range and subtract the offset
         times = ntb(logic, 5:10);
         [range, mask] = calc_ranging(times);
         range = range(mask) - offset(j + 1);
-        posix_t = posix_t(mask);
-        % remove the offset calibrated from mocap data
         ranges{i + 1, j + 1} = range;
+
+        % save the time stamp
+        posix_t = timestamps(logic);
+        posix_t = posix_t(mask);
         posix_time{i + 1, j + 1} = posix_t;
+
         if display
             plot(posix_t, range)
             hold on
         end
+
     end
     if display
         legend('0', '1', '2', '3', '4', '5', '6', '7')
     end
 end
 
+
+
+
+
+%% old stuff 
 % if exist('mocap.mat', 'file') == 2
 %     mocap = load('mocap');
 %     mocap = mocap.mocap;

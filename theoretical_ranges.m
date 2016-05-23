@@ -8,10 +8,13 @@ global anchors
 if M ~= 3
     error('input needs to be 3d coordinates!')
 end
-Y = [];
+
+Y = zeros(N, 8);
 for i = 1:8
-    tmp = input - repmat(anchors(i,:),N, 1);
-    Y = [Y sqrt(tmp(:,1).^2 + tmp(:,2).^2 + tmp(:,3).^2)];
+    %tmp is the vector between the input points and anchor node i
+    tmp = input - repmat(anchors(i,:), N, 1);
+    %calc the distance of the input points with the anchor node i
+    Y(:, i) = (sqrt(tmp(:,1).^2 + tmp(:,2).^2 + tmp(:,3).^2));
 end
 
 end
