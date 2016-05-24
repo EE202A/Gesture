@@ -23,7 +23,7 @@ anchors = [
 
 %% load data from data folder
 % load data, mode = 3,4
-mode = 2;
+mode = 4;
 [ranges, posix_time, offset] = load_ntbdata(mode, 0);
 mocap = load_mocapdata(mode);    
 
@@ -42,14 +42,14 @@ for i = 1:8
            f = [f j - 1];   % the actual node index
            %found_id{i} = [found_id{i}, {ids, stroke}];
            
-%            % using tianrui zhang big god's algo
-%            param = cell(8,1);
-%            for ii = 1:8
-%             param{ii} = ranges{i,ii};
-%            end
-%            start = localization(param);
-           % using mocap data
-           start = mean(mocap{i}(1:10,3:5),1);
+%            using tianrui zhang big god's algo
+           param = cell(8,1);
+           for ii = 1:8
+            param{ii} = ranges{i,ii};
+           end
+           start = localization(param);
+%            % using mocap data
+%            start = mean(mocap{i}(1:10,3:5),1);
            cors = estimate_cor(stroke, j - 1, start);
            th_ranges = theoretical_ranges(cors);
            t = posix_time{i,j}(ids);
@@ -80,7 +80,7 @@ performance = zeros(8,2);
 % accur_synth = zeros(8,2);
 for i = 1:8
     if isempty(found{i})
-        performance(i) = [-1 -1];
+        performance(i,:) = [-1 -1];
 %         accur_std(i) = 0;
         continue
     end

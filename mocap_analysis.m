@@ -1,6 +1,6 @@
 %% caculate the "pointing vector" from mocap data
 % data2 folder
-mode = 2;
+mode = 4;
 anchors = [
         -3.817, 2.416, 2.296;
         1.062, 2.381, 2.308;

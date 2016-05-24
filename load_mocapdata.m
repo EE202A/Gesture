@@ -9,8 +9,8 @@ for i = 1:8
         filename = ['data2/mocap', num2str(i - 1), '.csv'];
     elseif mode == 3
         filename = ['data3/mocap', num2str(i - 1), '.csv'];
-%     elseif mode == 4
-%         filename = ['data4/mocap', num2str(i - 1), '.csv'];
+    elseif mode == 4
+        filename = ['data4/mocap', num2str(i - 1), '.csv'];
     else 
         error('no such shit') 
     end

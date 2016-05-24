@@ -3,13 +3,14 @@ function [ ranges, posix_time, offset] = load_ntbdata( mode, display)
 %   Detailed explanation goes here
 
 %% calculate offset
-if exist('offset.mat', 'file') == 2
-    offset = load('offset');
-    offset = offset.offset;
-elseif exist('offset/ntb_offset.csv', 'file') == 2 ...
-        && exist('offset/mocap_offset.csv', 'file') == 2
-    ntb = load('offset/ntb_offset.csv');
-    mocap = load('offset/mocap_offset.csv');
+% if exist('offset.mat', 'file') == 2
+%     offset = load('offset');
+%     offset = offset.offset;
+offset_num = 0;
+if exist(['offset/ntb_offset', num2str(offset_num), '.csv'], 'file') == 2 ...
+        && exist(['offset/mocap_offset', num2str(offset_num), '.csv'], 'file') == 2
+    ntb = load(['offset/ntb_offset', num2str(offset_num), '.csv']);
+    mocap = load(['offset/mocap_offset', num2str(offset_num), '.csv']);
     timestamps = ntb(:,1);
     recv_ids = ntb(:,3);
     rs = cell(8,1);
@@ -51,8 +52,8 @@ for i = labels
         filename = ['data2/ntb', num2str(i), '.csv'];
     elseif mode == 3
         filename = ['data3/ntb', num2str(i), '.csv'];
-%     elseif mode == 4
-%         filename = ['data4/ntb', num2str(i), '.csv'];
+    elseif mode == 4
+        filename = ['data4/ntb', num2str(i), '.csv'];
     else
         error('no such dataset')
     end

@@ -9,8 +9,11 @@ function [ loc ] = localization(ranges)
 global anchors;
 range = zeros(1,8);
 for i = 1:8
-    r = ranges{1};
-    range(i) = mean(r(1:15));
+    if isempty(ranges{i})
+        % do some shit
+    end
+    r = ranges{i};
+    range(i) = mean(r(1:8));
 end
 % range = [4.777,3.916,4.269,5.47,2.001,2.512,3.29,6.01]; %test data1--initial location
 % range = [4.41,3.062,4.593,5.539,1.414,2.6,3.349,5.332]; %test data2--end point
@@ -62,8 +65,8 @@ end
 % display(b);
 % display(counter_loop)
 loc1 = loc1/counter;
-% display(loc1);
+display(loc1);
 loc2 = A\b;
-% display(loc2);
+display(loc2);
 loc = (loc1 + loc2')/2;
 
