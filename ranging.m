@@ -16,7 +16,7 @@ anchors = [
 
 %% load data from data folder
 % load data, mode = 3,4
-mode = 2;
+mode = 4;
 [ranges, posix_time, offset] = load_ntbdata(mode, 0);
 mocap = load_mocapdata(mode);    
 
@@ -55,6 +55,11 @@ for i = 1:8
            start = mean(mocap{i}(1:10,3:5), 1);
            cors = estimate_cor(stroke, j - 1, start);
            
+           figure, scatter3(anchors(:,1), anchors(:,2), anchors(:,3))
+           hold on;
+           scatter3(cors(:,1), cors(:,2), cors(:,3))
+           
+           
            %estimate the theoretical dist between the 8 anchor node and the
            %valley points
            th_ranges = theoretical_ranges(cors);
@@ -66,8 +71,8 @@ for i = 1:8
                     continue
                 end
                 %time sync to get at the same time of the valley
-                %find the begin time and end time at the anchor node for
-                %the valley, return the idx
+                %find the begin time and end time at each anchor node for
+                %the valley, return the idx for time series
                 [beg, en] = find_slot(t(1), t(end), posix_time{i,k});
                 
                 if beg == -1    % no corresponding time measurement
@@ -77,10 +82,15 @@ for i = 1:8
                 %smooth the whole tracjectory
                 rr = mov_avg_filter(ranges{i,k});
                 
-                %t: the valley duration time stamp
+                %t: the valley duration time stamp at j anchor node
+                %   t = posix_time{i,k}(beg:en) when k=j
                 %th_ranges(:,k): the dist to the k anchor node
-                %posix_time{i,k}(beg:en): same as t, might be diff.....
+                %posix_time{i,k}(beg:en): the time slot at anchor node k
                 %rr(beg:en): the smoothed valley part of the trackjectory
+                %            at each anchor node.
+                %compare the theoretical distance with the practice valley
+                %and output a score to evaulate how far these two signal is
+                %different
                 scores(:,k) = compare_ranges(t, th_ranges(:,k), posix_time{i,k}(beg:en), rr(beg:en));
            end
            found_id{i} = [found_id{i}, [mean(scores); var(scores)]];

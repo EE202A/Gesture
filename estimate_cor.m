@@ -5,10 +5,6 @@ function [ y ] = estimate_cor( delta_rin, id, start )
 %              start -- the initial localization point
 %   output: y -- result N by 3 coordinates
 
-%localization base on the dist between anchor node
-%has to know which anchor the user is pointing to
-%so this localization is only for training not for test
-
 global anchors
 [n, m] = size(start);
 if n ~= 1 || m ~= 3

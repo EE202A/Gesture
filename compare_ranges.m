@@ -33,7 +33,7 @@ x21 = x21 - (x21(1) - x1(1));
 
 
 % average euclidean distance between 2 signals
-%get the score how far is the distance between te two signal as the
+%get the score how far is the distance between the two signal as the
 %evaulation score
 y = norm(x21 - x1) / length(x1);
 

@@ -21,10 +21,10 @@ if exist('offset.mat', 'file') == 2
     offset = offset.offset;
 %calc the offset
 %calibrate the data base on the mocap data and ntb data at a fixed point
-elseif exist('offset/ntb_offset.csv', 'file') == 2 ...
-        && exist('offset/mocap_offset.csv', 'file') == 2
-    ntb = load('offset/ntb_offset.csv');
-    mocap = load('offset/mocap_offset.csv');
+elseif exist('offset/ntb_offset1.csv', 'file') == 2 ...
+        && exist('offset/mocap_offset1.csv', 'file') == 2
+    ntb = load('offset/ntb_offset1.csv');
+    mocap = load('offset/mocap_offset1.csv');
     
     %get the practice range from ntb
     recv_ids = ntb(:,3);    %get anchor id
@@ -76,6 +76,8 @@ for i = labels
         filename = ['data2/ntb', num2str(i), '.csv'];
     elseif mode == 3
         filename = ['data3/ntb', num2str(i), '.csv'];
+    elseif mode == 4
+        filename = ['data4/ntb', num2str(i), '.csv'];
     else
         error('no ntb ranges dataset')
     end
