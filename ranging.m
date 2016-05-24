@@ -41,7 +41,7 @@ for i = 1:8
            
            
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%          
-%            % using tianrui zhang big god's algo
+%            % using localization algo
 %            param = cell(8,1);
 %            for ii = 1:8
 %             param{ii} = ranges{i,ii};
