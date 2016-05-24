@@ -1,13 +1,6 @@
 close all
-clear all
-% if exist('ranges.mat', 'file') == 2
-%     ranges = load('ranges');
-%     ranges = ranges.ranges;
-% end
-% if exist('posix_time.mat', 'file') == 2
-%     posix_time = load('posix_time');
-%     posix_time = posix_time.posix_time;
-% end
+clear
+
 % 8 * 3 matrix, [x y z] from Alpha to Hotel, in meters
 global anchors
 anchors = [
@@ -27,21 +20,26 @@ mode = 4;
 [ranges, posix_time, offset] = load_ntbdata(mode, 0);
 mocap = load_mocapdata(mode);    
 
-
 %% ranging experiment
 found = cell(8,1);
 found_id = cell(8,1);
 for i = 1:8
+    
+    %f store all the potential candidates
     f = [];
     found_id{i} = [];
     for j = 1:8
+       % find the first valley for one trajectory
        [ids, stroke] = find_first_valley(ranges{i,j});
+       
        if isempty(ids)
            continue
        else
+           %find a valley for anchor node j-1
            f = [f j - 1];   % the actual node index
            %found_id{i} = [found_id{i}, {ids, stroke}];
            
+
 %            using tianrui zhang big god's algo
            param = cell(8,1);
            for ii = 1:8
@@ -50,27 +48,52 @@ for i = 1:8
            start = localization(param);
 %            % using mocap data
 %            start = mean(mocap{i}(1:10,3:5),1);
+
            cors = estimate_cor(stroke, j - 1, start);
+           
+           figure, scatter3(anchors(:,1), anchors(:,2), anchors(:,3))
+           hold on;
+           scatter3(cors(:,1), cors(:,2), cors(:,3))
+           
+           
+           %estimate the theoretical dist between the 8 anchor node and the
+           %valley points
            th_ranges = theoretical_ranges(cors);
+           
            t = posix_time{i,j}(ids);
-           scores = [];
+           scores = zeros(1, 8);
            for k = 1:8
                 if isempty(posix_time{i,k}) % no measurements
                     continue
                 end
+                %time sync to get at the same time of the valley
+                %find the begin time and end time at each anchor node for
+                %the valley, return the idx for time series
                 [beg, en] = find_slot(t(1), t(end), posix_time{i,k});
+                
                 if beg == -1    % no corresponding time measurement
                     continue
                 end
+                
+                %smooth the whole tracjectory
                 rr = mov_avg_filter(ranges{i,k});
-                scores = [scores, compare_ranges(t, th_ranges(:,k), ...
-                            posix_time{i,k}(beg:en), rr(beg:en))];
+                
+                %t: the valley duration time stamp at j anchor node
+                %   t = posix_time{i,k}(beg:en) when k=j
+                %th_ranges(:,k): the dist to the k anchor node
+                %posix_time{i,k}(beg:en): the time slot at anchor node k
+                %rr(beg:en): the smoothed valley part of the trackjectory
+                %            at each anchor node.
+                %compare the theoretical distance with the practice valley
+                %and output a score to evaulate how far these two signal is
+                %different
+                scores(:,k) = compare_ranges(t, th_ranges(:,k), posix_time{i,k}(beg:en), rr(beg:en));
            end
            found_id{i} = [found_id{i}, [mean(scores); var(scores)]];
        end
     end
-    found{i} = f;
     
+    found{i} = f;
 end
 
 %% Evaluation 
@@ -85,12 +108,16 @@ for i = 1:8
         continue
     end
     % evaluation metrics -- f([mean], [std])
+    % evaluation metrics lowest sum of mean and std
     eval = found_id{i}(1,:) + found_id{i}(2,:);
     [~, id_mean] = min(eval);
+    
 %     [tmp, id_std] = min(found_id{i}(2,:));
     % trust score calculation -- compare with second largest element 
     tmp = sort(eval);
     if length(tmp) > 1
+        %final score definte as the how many times is the lowest score to
+        %the second lowest score
         score = tmp(1) / tmp(2);
     else
         score = 0;

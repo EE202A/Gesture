@@ -25,10 +25,16 @@ end
 if t2(1) > t1(1) || t2(end) < t1(end)
     error('interpolation failed!')
 end
+
+%if t1!=t2, interpolate
 x21 = interp1(t2, x2, t1);
 % keep only relative changes value -- necessary
 x21 = x21 - (x21(1) - x1(1));
+
+
 % average euclidean distance between 2 signals
+%get the score how far is the distance between the two signal as the
+%evaulation score
 y = norm(x21 - x1) / length(x1);
 
 
