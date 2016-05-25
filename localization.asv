@@ -9,15 +9,16 @@ function [ loc ] = localization(ranges)
 global anchors;
 range = zeros(1,8);
 for i = 1:8
-    if length(ranges{i}) < 9
+    if length(ranges{i}) < 10
         continue;
     end
     r = ranges{i};
-    range(i) = mean(r(1:5));
+    range(i) = mean(r(1:8));
 end
 
 % range = [4.777,3.916,4.269,5.47,2.001,2.512,3.29,6.01]; %test data1--initial location
 % range = [4.41,3.062,4.593,5.539,1.414,2.6,3.349,5.332]; %test data2--end point
+% range = [4.1323    3.3406    3.7818    4.9429    1.5455    1.9354    2.7472    4.0470];
 display(range)
 syms x y z;
 x_limits = [-5.88, 3.055];
@@ -39,9 +40,12 @@ if(length(valid_range_index) < 3)
    return
 end
 
-node1 = anchors(valid_range_index(1),:);
-for i = valid_range_index(2)
-    for k = valid_range_index(3:end) 
+node1 = anchors(1,:);
+for i = valid_range_index(1)
+    for k = valid_range_index(2:end) 
+        if range(k) == 0
+            continue;
+        end
         counter_loop = counter_loop+1;
         nodei = anchors(i,:);
         nodek = anchors(k,:);
@@ -73,8 +77,8 @@ end
 % display(b);
 % display(counter_loop)
 loc1 = loc1/counter;
-display(loc1);
+% display(loc1);
 loc2 = A\b;
-display(loc2');
+% display(loc2');
 loc = (loc1 + loc2')/2;
 

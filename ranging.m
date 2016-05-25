@@ -16,7 +16,7 @@ anchors = [
 
 %% load data from data folder
 % load data, mode = 3,4
-mode = 4;
+mode = 2;
 [ranges, posix_time, offset] = load_ntbdata(mode, 0);
 mocap = load_mocapdata(mode);    
 
@@ -40,7 +40,7 @@ for i = 1:8
            %found_id{i} = [found_id{i}, {ids, stroke}];
            
 
-%            using tianrui zhang big god's algo
+%            using tianrui zhang's algo
            param = cell(8,1);
            for ii = 1:8
             param{ii} = ranges{i,ii};
@@ -51,10 +51,10 @@ for i = 1:8
 
            cors = estimate_cor(stroke, j - 1, start);
            
-           figure, scatter3(anchors(:,1), anchors(:,2), anchors(:,3))
-           hold on;
-           scatter3(cors(:,1), cors(:,2), cors(:,3))
-           
+%            figure, scatter3(anchors(:,1), anchors(:,2), anchors(:,3))
+%            hold on;
+%            scatter3(cors(:,1), cors(:,2), cors(:,3))
+%            
            
            %estimate the theoretical dist between the 8 anchor node and the
            %valley points

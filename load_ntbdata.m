@@ -15,7 +15,6 @@ function [ ranges, posix_time, offset] = load_ntbdata( mode, display)
 
 
 %% calculate offset
-<<<<<<< HEAD
 % if exist('offset.mat', 'file') == 2
 %     offset = load('offset');
 %     offset = offset.offset;
@@ -27,7 +26,6 @@ if exist(['offset/ntb_offset', num2str(offset_num), '.csv'], 'file') == 2 ...
     timestamps = ntb(:,1);
     recv_ids = ntb(:,3);
     rs = cell(8,1);
-=======
 % fetch offset from cache
 if exist('offset.mat', 'file') == 2
     offset = load('offset');
@@ -42,7 +40,6 @@ elseif exist('offset/ntb_offset1.csv', 'file') == 2 ...
     %get the practice range from ntb
     recv_ids = ntb(:,3);    %get anchor id
     rs = cell(8,1);         
->>>>>>> 30219218ab1587e1f80f0c0b48e05a8268414bd0
     for i = 0:7
         %get mask for extract data for each node in the ntb data file
         logic = (recv_ids == i);
