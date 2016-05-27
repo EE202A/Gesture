@@ -1,4 +1,6 @@
 from ranging import get_score
 
 
-get_score(0)
+score = get_score(0)
+
+print score
