@@ -5,8 +5,9 @@ from load_mocap import get_mocap_data
 from find_first_valley import get_first_valley
 from estimate_coor import get_estimate_coors
 from theoretical_ranges import theoretical_ranges_with_all
-from ntb_data_from_others import get_ntb_from_others
+from ntb_data_from_others import get_ntb_from_others, get_localization_data
 from compare_ranges import get_score_of_nodes
+from localization import localization
 
 
 class ntb_score:
@@ -47,14 +48,14 @@ class ntb_score:
     # if didn't find valley then score is (-1, -1) and don't need to get the global ntb data.
     # this should be set in ray's function
     def get_score(self, global_ntb_data):
-        # find a valley
-        start = [] # wait for ray's localizaiton
+
+        localization_data = get_localization_data(global_ntb_data)
+        start = localization(localization_data)
+
         coors = get_estimate_coors(self.anchor_node, self.stroke, start)
         # calc the theoretical range with all node
         th_ranges = theoretical_ranges_with_all(coors)
         t = self.posix_time[self.ids]
-
-        # TODO: broadcast t, and request interpolated smoothed strokes from all node
 
         pkl_data = get_ntb_from_others(t, global_ntb_data)
 

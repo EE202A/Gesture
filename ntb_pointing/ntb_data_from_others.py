@@ -87,6 +87,15 @@ def get_ntb_from_others(base_time_span, global_ntb_data):
     return pkl_data
 
 
+def get_localization_data(global_ntb_data):
+    re = []
+    for iNode in range(8):
+        ntb, time = read_ntb_data_test(iNode, global_ntb_data)
+        re.append(ntb)
+
+    re = np.asarray(re)
+    return re
+
 
 
 
