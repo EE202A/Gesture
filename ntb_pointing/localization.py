@@ -1,9 +1,7 @@
 import numpy as np
-# from global_var_config import anchor_coor
-# from sympy import Symbol, nsolve
+from global_var_config import anchor_coor
 from scipy.optimize import fsolve
 from numpy import linalg as la
-import math
 from global_var_config import anchor_coor
 
 DATA_TYPE = np.float64
@@ -28,26 +26,26 @@ def inBtw(value, limits):
 
 def localization(ranges):
 	global range_ray
-	# range = [4.777,3.916,4.269,5.47,2.001,2.512,3.29,6.01] 
+	# range = [4.777,3.916,4.269,5.47,2.001,2.512,3.29,6.01]
 	# range = [4.41,3.062,4.593,5.539,1.414,2.6,3.349,100]
 	# range = [4.41,3.062,4.593,5.539,1.414,2.6,3.349,5.332]
 	range_ray = []
 
 	for i in range(8):
-		r = ranges[i,:]
+		r = ranges[i]
 		if len(r) < 9:
 			range_ray.append(0)
 		else:
 			range_ray.append(sum(r[:6]) / 5)
-	
+
 	valid_range_index = find(range_ray, lambda x: x != 0)
 	print valid_range_index
 	if len(valid_range_index) < 3:
 		# rospy.loginfo("Less than three ranges obtained. Cannot perform localization")
 		return []
 
-	counter=0; 
-	counter_loop = 0;
+	counter=0
+	counter_loop = 0
 	loc1 = np.array([0,0,0])
 	A = []
 	b = []
@@ -77,5 +75,3 @@ def localization(ranges):
 	loc2 = np.dot(la.pinv(np.array(A)), np.array(b))
 	# print "loc1=", loc1, "loc2=",loc2
 	return loc1+loc2/2
-
-print localization([])
