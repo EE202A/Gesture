@@ -4,13 +4,11 @@ from global_var_config import DATA_TYPE
 from calc_ranging import calc_ranging
 
 
-def get_ntb_data(base_anchor_node, anchor_node, offset, local_ntb_data):
+def get_ntb_data(anchor_node, offset, local_ntb_data):
 
     re_ntb = []
     re_posix_t = []
-    # filename = './data/ntb/ntb'+str(base_anchor_node)+'.csv'
     if len(local_ntb_data) != 0:
-        # ntb = np.genfromtxt(filename, delimiter=',', dtype=DATA_TYPE)
         ntb = local_ntb_data
         timestamps = ntb[:, 0]
         recv_ids = ntb[:, 2]

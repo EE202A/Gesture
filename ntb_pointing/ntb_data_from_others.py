@@ -17,10 +17,9 @@ offset = [0.656404984046231,
           1.945990857037977]
 
 
-def read_ntb_data_test(anchor_node, base_anchor_node, global_ntb_data):
+def read_ntb_data_test(anchor_node, global_ntb_data):
     re_ntb = []
     re_posix_t = []
-    # filename = './data/ntb/ntb'+str(base_anchor_node)+'.csv'
     if len(global_ntb_data) != 0:
         # ntb = np.genfromtxt(filename, delimiter=',', dtype=DATA_TYPE)
         ntb = global_ntb_data
@@ -56,7 +55,7 @@ def read_ntb_data_test(anchor_node, base_anchor_node, global_ntb_data):
     return re_ntb, re_posix_t
 
 
-def get_ntb_from_others(base_time_span, base_anchor_node, global_ntb_data):
+def get_ntb_from_others(base_time_span, global_ntb_data):
     # currently read from the cache
     # TODO: fetch interpolated smoothed strokes from other nodes base on time span
 
@@ -65,7 +64,7 @@ def get_ntb_from_others(base_time_span, base_anchor_node, global_ntb_data):
     idx = []
 
     for iNode in range(8):
-        ntb_range, ntb_time = read_ntb_data_test(iNode, base_anchor_node, global_ntb_data)
+        ntb_range, ntb_time = read_ntb_data_test(iNode, global_ntb_data)
         begin_idx, end_idx = get_slot(base_time_span, ntb_time)
 
         if begin_idx == -1:

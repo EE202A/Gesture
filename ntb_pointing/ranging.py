@@ -21,18 +21,18 @@ def get_global_mocap_data():
     return []
 
 
-def get_score(base_anchor_node, anchor_node):
+def get_score(anchor_node):
     offset = get_offset(anchor_node)
 
     local_ntb_data = get_local_ntb_data()
-    ntb_range, posix_time = get_ntb_data(base_anchor_node, anchor_node, offset, local_ntb_data)
+    ntb_range, posix_time = get_ntb_data(anchor_node, offset, local_ntb_data)
 
     if len(ntb_range) == 0:
         print '[ranging]: ' + 'Anchor node: ', anchor_node, ' get no data, output score is -1'
         return -1, -1
 
     global_mocap_data = get_global_mocap_data()
-    mocap = get_mocap_data(base_anchor_node, global_mocap_data)
+    mocap = get_mocap_data(global_mocap_data)
 
     find_valley, ids, stroke = get_first_valley(ntb_range)
     if not find_valley:
@@ -55,7 +55,7 @@ def get_score(base_anchor_node, anchor_node):
             # TODO: broadcast t, and request interpolated smoothed strokes from all node
 
             global_ntb_data = get_global_ntb_data()
-            pkl_data = get_ntb_from_others(t, base_anchor_node, global_ntb_data)
+            pkl_data = get_ntb_from_others(t, global_ntb_data)
 
             scores = []
             for iNode in range(len(pkl_data['idx'])):
