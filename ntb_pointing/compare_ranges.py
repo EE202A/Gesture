@@ -5,7 +5,7 @@ from numpy import linalg as la
 def get_score_of_nodes(base_time, th_range, anchor_time, actual_range):
 
     if anchor_time[0] > base_time[0] or anchor_time[-1] < base_time[-1]:
-        print 'Error interpolate!'
+        print '[compare_ranges]: ' + 'Error interpolate!'
         return -1
     else:
         x21 = np.interp(base_time, anchor_time, actual_range)

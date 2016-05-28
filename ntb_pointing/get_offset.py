@@ -20,7 +20,7 @@ def calc_offset(ntb, mocap):
                 break
 
         if not missing_bool:
-            print 'Offset calc missing node', iNode
+            print '[get_offset]: ' + 'Offset calc missing node', iNode
             offsets.append(0)
         else:
             times = ntb[logic, 4:10]
@@ -57,6 +57,6 @@ def get_offset(anchor_node):
 
         # print 'Calc offset from data, offset: ', re
     else:
-        print 'No offset data csv file!'
+        print '[get_offset]: ' + 'No offset data csv file!'
 
     return re

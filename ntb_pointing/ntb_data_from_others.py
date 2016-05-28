@@ -17,12 +17,13 @@ offset = [0.656404984046231,
           1.945990857037977]
 
 
-def read_ntb_data_test(anchor_node, base_anchor_node):
+def read_ntb_data_test(anchor_node, base_anchor_node, global_ntb_data):
     re_ntb = []
     re_posix_t = []
-    filename = './data/ntb/ntb'+str(base_anchor_node)+'.csv'
-    if os.path.exists(filename):
-        ntb = np.genfromtxt(filename, delimiter=',', dtype=DATA_TYPE)
+    # filename = './data/ntb/ntb'+str(base_anchor_node)+'.csv'
+    if len(global_ntb_data) != 0:
+        # ntb = np.genfromtxt(filename, delimiter=',', dtype=DATA_TYPE)
+        ntb = global_ntb_data
         timestamps = ntb[:, 0]
         recv_ids = ntb[:, 2]
 
@@ -34,7 +35,7 @@ def read_ntb_data_test(anchor_node, base_anchor_node):
                 break
 
         if not missing_bool:
-            print 'Missing Anchor node: ', anchor_node, ' data!!!'
+            print '[ntb_data_from_others]: ' + 'Missing Anchor node: ', anchor_node, ' data!!!'
 
         else:
             times = ntb[logic, 4:10]
@@ -50,12 +51,12 @@ def read_ntb_data_test(anchor_node, base_anchor_node):
             re_posix_t = posix_t
 
     else:
-        print 'No Anchor node: ', anchor_node, ' data csv file!!! At ', filename
+        print '[ntb_data_from_others]: ' + 'No Anchor node: ', anchor_node, ' data!!!'
 
     return re_ntb, re_posix_t
 
 
-def get_ntb_from_others(base_time_span, base_anchor_node):
+def get_ntb_from_others(base_time_span, base_anchor_node, global_ntb_data):
     # currently read from the cache
     # TODO: fetch interpolated smoothed strokes from other nodes base on time span
 
@@ -64,11 +65,11 @@ def get_ntb_from_others(base_time_span, base_anchor_node):
     idx = []
 
     for iNode in range(8):
-        ntb_range, ntb_time = read_ntb_data_test(iNode, base_anchor_node)
+        ntb_range, ntb_time = read_ntb_data_test(iNode, base_anchor_node, global_ntb_data)
         begin_idx, end_idx = get_slot(base_time_span, ntb_time)
 
         if begin_idx == -1:
-            print 'No time corresponding data at anchor node: ', iNode
+            print '[ntb_data_from_others]: ' + 'No time corresponding data at anchor node: ', iNode
             ntb_ranges_data.append([])
             ntb_times_data.append([])
             idx.append(iNode)

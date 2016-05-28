@@ -9,25 +9,40 @@ from ntb_data_from_others import get_ntb_from_others
 from compare_ranges import get_score_of_nodes
 
 
+def get_local_ntb_data():
+    return []
+
+
+def get_global_ntb_data():
+    return []
+
+
+def get_global_mocap_data():
+    return []
+
+
 def get_score(base_anchor_node, anchor_node):
     offset = get_offset(anchor_node)
-    ntb_range, posix_time = get_ntb_data(base_anchor_node, anchor_node, offset)
+
+    local_ntb_data = get_local_ntb_data()
+    ntb_range, posix_time = get_ntb_data(base_anchor_node, anchor_node, offset, local_ntb_data)
 
     if len(ntb_range) == 0:
-        print 'Anchor node: ', anchor_node, ' get no data, output score is -1'
+        print '[ranging]: ' + 'Anchor node: ', anchor_node, ' get no data, output score is -1'
         return -1, -1
 
-    mocap = get_mocap_data(base_anchor_node)
+    global_mocap_data = get_global_mocap_data()
+    mocap = get_mocap_data(base_anchor_node, global_mocap_data)
 
     find_valley, ids, stroke = get_first_valley(ntb_range)
     if not find_valley:
-        print 'Find no valley at this anchor node! output score is -1'
+        print '[ranging]: ' + 'Find no valley at this anchor node! output score is -1'
         return -1, -1
     else:
         # find a valley
         # estimate the start point, here use mocap data, later use Ray's algo
         if len(mocap) == 0:
-            print 'No Mocap data, cannot estimate the start point coordinate! output score is -1'
+            print '[ranging]: ' + 'No Mocap data, cannot estimate the start point coordinate! output score is -1'
             return -1, -1
 
         else:
@@ -39,7 +54,8 @@ def get_score(base_anchor_node, anchor_node):
 
             # TODO: broadcast t, and request interpolated smoothed strokes from all node
 
-            pkl_data = get_ntb_from_others(t, base_anchor_node)
+            global_ntb_data = get_global_ntb_data()
+            pkl_data = get_ntb_from_others(t, base_anchor_node, global_ntb_data)
 
             scores = []
             for iNode in range(len(pkl_data['idx'])):

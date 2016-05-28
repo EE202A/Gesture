@@ -4,13 +4,14 @@ from global_var_config import DATA_TYPE
 from calc_ranging import calc_ranging
 
 
-def get_ntb_data(base_anchor_node, anchor_node, offset):
+def get_ntb_data(base_anchor_node, anchor_node, offset, local_ntb_data):
 
     re_ntb = []
     re_posix_t = []
-    filename = './data/ntb/ntb'+str(base_anchor_node)+'.csv'
-    if os.path.exists(filename):
-        ntb = np.genfromtxt(filename, delimiter=',', dtype=DATA_TYPE)
+    # filename = './data/ntb/ntb'+str(base_anchor_node)+'.csv'
+    if len(local_ntb_data) != 0:
+        # ntb = np.genfromtxt(filename, delimiter=',', dtype=DATA_TYPE)
+        ntb = local_ntb_data
         timestamps = ntb[:, 0]
         recv_ids = ntb[:, 2]
 
@@ -22,7 +23,7 @@ def get_ntb_data(base_anchor_node, anchor_node, offset):
                 break
 
         if not missing_bool:
-            print 'Missing Anchor node: ', anchor_node, ' data!!!'
+            print '[load_ntb]: ' + 'Missing Anchor node: ', anchor_node, ' data!!!'
         else:
             times = ntb[logic, 4:10]
             ntb_range, mask = calc_ranging(times)
@@ -36,7 +37,7 @@ def get_ntb_data(base_anchor_node, anchor_node, offset):
             re_ntb = ntb_range
             re_posix_t = posix_t
     else:
-        print 'No Anchor node: ', anchor_node, ' data csv file!!! At ', filename
+        print '[load_ntb]: ' + 'No Anchor node: ', anchor_node, ' data!!!'
 
     return re_ntb, re_posix_t
 
