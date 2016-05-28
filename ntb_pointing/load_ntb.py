@@ -23,7 +23,6 @@ def get_ntb_data(base_anchor_node, anchor_node, offset):
 
         if not missing_bool:
             print 'Missing Anchor node: ', anchor_node, ' data!!!'
-
         else:
             times = ntb[logic, 4:10]
             ntb_range, mask = calc_ranging(times)
@@ -36,7 +35,6 @@ def get_ntb_data(base_anchor_node, anchor_node, offset):
 
             re_ntb = ntb_range
             re_posix_t = posix_t
-
     else:
         print 'No Anchor node: ', anchor_node, ' data csv file!!! At ', filename
 

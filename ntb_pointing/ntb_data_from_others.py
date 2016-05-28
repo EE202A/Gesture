@@ -7,7 +7,6 @@ from find_slot import get_slot
 from mov_avg_filter import smooth_filter
 
 
-
 offset = [0.656404984046231,
           0.544461924111784,
           0.471641501845964,
