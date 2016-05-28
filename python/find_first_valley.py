@@ -45,7 +45,8 @@ def get_first_valley(signal):
     if right - left > 15 and right == n:
         right -= th_t
 
-    ids = np.arange(left+shift, right+shift+1, 1)
+    right_bound = min(right+shift, y.shape[0])
+    ids = np.arange(left+shift, right_bound, 1)
     stroke = y[ids]
     find_valley = True
 

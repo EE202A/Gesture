@@ -1,25 +1,23 @@
 import numpy as np
-import pickle as pkl
 from get_offset import get_offset
 from load_ntb import get_ntb_data
 from load_mocap import get_mocap_data
 from find_first_valley import get_first_valley
 from estimate_coor import get_estimate_coors
 from theoretical_ranges import theoretical_ranges_with_all
-from global_var_config import anchor_count
 from ntb_data_from_others import get_ntb_from_others
 from compare_ranges import get_score_of_nodes
 
 
-def get_score(anchor_node):
+def get_score(base_anchor_node, anchor_node):
     offset = get_offset(anchor_node)
-    ntb_range, posix_time = get_ntb_data(anchor_node, offset)
+    ntb_range, posix_time = get_ntb_data(base_anchor_node, anchor_node, offset)
 
     if len(ntb_range) == 0:
         print 'Anchor node: ', anchor_node, ' get no data, output score is -1'
         return -1, -1
 
-    mocap = get_mocap_data(anchor_node)
+    mocap = get_mocap_data(base_anchor_node)
 
     find_valley, ids, stroke = get_first_valley(ntb_range)
     if not find_valley:
@@ -41,7 +39,7 @@ def get_score(anchor_node):
 
             # TODO: broadcast t, and request interpolated smoothed strokes from all node
 
-            pkl_data = get_ntb_from_others(t, anchor_node)
+            pkl_data = get_ntb_from_others(t, base_anchor_node)
 
             scores = []
             for iNode in range(len(pkl_data['idx'])):
