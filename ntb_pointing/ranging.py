@@ -9,61 +9,62 @@ from ntb_data_from_others import get_ntb_from_others
 from compare_ranges import get_score_of_nodes
 
 
-def get_local_ntb_data():
-    return []
+class ntb_score:
 
+    local_ntb_data = []
+    anchor_node = []
+    stroke = []
+    ids = []
+    posix_time = []
 
-def get_global_ntb_data():
-    return []
+    def __init__(self, anchor_node, local_ntb_data):
+        self.local_ntb_data = local_ntb_data
+        self.anchor_node = anchor_node
+        pass
 
+    def find_valley(self):
+        offset = get_offset(self.anchor_node)
 
-def get_global_mocap_data():
-    return []
+        ntb_range, posix_time = get_ntb_data(self.anchor_node, offset, self.local_ntb_data)
 
+        if len(ntb_range) == 0:
+            print '[ranging]: ' + 'Anchor node: ', self.anchor_node, ' get no data, output score is -1'
+            return False
 
-def get_score(anchor_node):
-    offset = get_offset(anchor_node)
+        find_valley, ids, stroke = get_first_valley(ntb_range)
 
-    local_ntb_data = get_local_ntb_data()
-    ntb_range, posix_time = get_ntb_data(anchor_node, offset, local_ntb_data)
+        self.stroke = stroke
+        self.ids = ids
+        self.posix_time = posix_time
 
-    if len(ntb_range) == 0:
-        print '[ranging]: ' + 'Anchor node: ', anchor_node, ' get no data, output score is -1'
-        return -1, -1
-
-    global_mocap_data = get_global_mocap_data()
-    mocap = get_mocap_data(global_mocap_data)
-
-    find_valley, ids, stroke = get_first_valley(ntb_range)
-    if not find_valley:
-        print '[ranging]: ' + 'Find no valley at this anchor node! output score is -1'
-        return -1, -1
-    else:
-        # find a valley
-        # estimate the start point, here use mocap data, later use Ray's algo
-        if len(mocap) == 0:
-            print '[ranging]: ' + 'No Mocap data, cannot estimate the start point coordinate! output score is -1'
-            return -1, -1
-
+        if not find_valley:
+            print '[ranging]: ' + 'Find no valley at this anchor node! output score is -1'
+            return False
         else:
-            start = np.mean(mocap[0:10, 2:5], axis=0)
-            coors = get_estimate_coors(anchor_node, stroke, start)
-            # calc the theoretical range with all node
-            th_ranges = theoretical_ranges_with_all(coors)
-            t = posix_time[ids]
+            return True
 
-            # TODO: broadcast t, and request interpolated smoothed strokes from all node
+    # if find valley then get the global ntb data and then calc score
+    # if didn't find valley then score is (-1, -1) and don't need to get the global ntb data.
+    # this should be set in ray's function
+    def get_score(self, global_ntb_data):
+        # find a valley
+        start = [] # wait for ray's localizaiton
+        coors = get_estimate_coors(self.anchor_node, self.stroke, start)
+        # calc the theoretical range with all node
+        th_ranges = theoretical_ranges_with_all(coors)
+        t = self.posix_time[self.ids]
 
-            global_ntb_data = get_global_ntb_data()
-            pkl_data = get_ntb_from_others(t, global_ntb_data)
+        # TODO: broadcast t, and request interpolated smoothed strokes from all node
 
-            scores = []
-            for iNode in range(len(pkl_data['idx'])):
-                node_idx = pkl_data['idx'][iNode]
-                if len(pkl_data['time_span'][node_idx]) == 0:
-                    scores.append(0)
-                else:
-                    score = get_score_of_nodes(t, th_ranges[:, node_idx], pkl_data['time_span'][node_idx], pkl_data['range_data'][node_idx])
-                    scores.append(score)
+        pkl_data = get_ntb_from_others(t, global_ntb_data)
 
-            return np.mean(scores), np.var(scores)
+        scores = []
+        for iNode in range(len(pkl_data['idx'])):
+            node_idx = pkl_data['idx'][iNode]
+            if len(pkl_data['time_span'][node_idx]) == 0:
+                scores.append(0)
+            else:
+                score = get_score_of_nodes(t, th_ranges[:, node_idx], pkl_data['time_span'][node_idx], pkl_data['range_data'][node_idx])
+                scores.append(score)
+
+        return np.mean(scores), np.var(scores)
