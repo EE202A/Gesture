@@ -58,12 +58,12 @@ def sendtwr(self):
 
 def ntb_timing_cb(data):
     global global_history_data
-    msgTime = data.header.stamp
-    timeFloat = msgTime.secs + msgTime.nsecs*1.0e-9
+    #msgTime = data.header.stamp
+    #timeFloat = msgTime.secs + msgTime.nsecs*1.0e-9
     # print to output
     #rospy.loginfo("Message: [%d->%d]\n", data.src, data.dst)
     # save to local data struct
-    data.header = timeFloat
+    #data.header = timeFloat
     global_history_data.append(data)
 
 def terminate_data_streaming(event):

@@ -39,24 +39,34 @@ def calc_offset(ntb, mocap):
 
 def get_offset(anchor_node):
 
-    re = 0
-    # check if cached offset exist
-    if os.path.exists('./offsets/offset.csv'):
-        re = np.genfromtxt('./offsets/offset.csv', delimiter=',', dtype=DATA_TYPE)[anchor_node]
-        # print 'Load offset from cache, offset: ', re
-    elif os.path.exists('./offsets/ntb_offset1.csv') and \
-         os.path.exists('./offsets/mocap_offset1.csv'):
+    # re = 0
+    # # check if cached offset exist
+    # if os.path.exists('./offsets/offset.csv'):
+    #     re = np.genfromtxt('./offsets/offset.csv', delimiter=',', dtype=DATA_TYPE)[anchor_node]
+    #     # print 'Load offset from cache, offset: ', re
+    # elif os.path.exists('./offsets/ntb_offset1.csv') and \
+    #      os.path.exists('./offsets/mocap_offset1.csv'):
 
-        ntb = np.genfromtxt('./offsets/ntb_offset1.csv', delimiter=',', dtype=DATA_TYPE)
-        mocap = np.genfromtxt('./offsets/mocap_offset1.csv', delimiter=',', dtype=DATA_TYPE)
-        offsets = calc_offset(ntb, mocap)
+    #     ntb = np.genfromtxt('./offsets/ntb_offset1.csv', delimiter=',', dtype=DATA_TYPE)
+    #     mocap = np.genfromtxt('./offsets/mocap_offset1.csv', delimiter=',', dtype=DATA_TYPE)
+    #     offsets = calc_offset(ntb, mocap)
 
-        np.savetxt('./offsets/offset.csv', offsets, delimiter=',')
+    #     np.savetxt('./offsets/offset.csv', offsets, delimiter=',')
 
-        re = offsets[anchor_node]
+    #     re = offsets[anchor_node]
 
-        # print 'Calc offset from data, offset: ', re
-    else:
-        print '[get_offset]: ' + 'No offset data csv file!'
+    #     # print 'Calc offset from data, offset: ', re
+    # else:
+    #     print '[get_offset]: ' + 'No offset data csv file!'
 
-    return re
+    offset = [0.656404984046231,
+          0.544461924111784,
+          0.471641501845964,
+          0.532032426364947,
+          0.473179630062969,
+          0.574526533721972,
+          0.515944162706270,
+          1.945990857037977]
+
+
+    return offset[anchor_node]
