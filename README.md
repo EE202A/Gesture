@@ -1,7 +1,14 @@
-# Gesture-based Device Selection Algorithm
-Matlab simulation and evaluation for a distributive gesture-based device selection algorithm that runs on each ntb nodes.
+# Gesture-based Device Selection System
+This repo consists of following components
+1. Matlab simulation and evaluation for a distributive gesture-based device selection algorithm that runs on each NTB nodes.
+2. Distributed version Python codes implemented on ROS platforms for the same system.
 
 #Structure of this repository
+Under Distributed(Python) folder
+1. file "anchor" is the code running on ROS nodes to control corrosponding NTB nodes
+2. Other files corroponds to the following Matlab version source codes. 
+
+Under Source(matlab) folder
 Data colleced: 
 
 1. Offset: mocap and ranging data measured at a fixed location for offset calculations
