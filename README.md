@@ -38,13 +38,12 @@ offsets found above. It also plot all ranging measurements at the same time.
 * <code>estimate_cor.m</code>: assuming user's movement is a straight line toward selected node, find the 3D coordinates of corresponding ranging measurements.
 * <code>theoretical_ranges</code>: given trace of 3D coordinates, find corresponding ranging measurements from all ntb anchor nodes.
 * <code>find_slot.m</code>: find the beginning and ending points of a slot given two corresponding thresholds
-* <code>compare_ranges.m</code>: Given two ranging measurments and corrosponding timestamps, return euclidean distance between the two measurements after 
-adjusting the measurments with linear interpolations. 
+* <code>compare_ranges.m</code>: Given two ranging measurments and corrosponding timestamps, return euclidean distance between the two measurements after adjusting the measurments with linear interpolations.  
+* <code>localization.m</code>: Using pseudo inverse to roughly estimate the pointing start position's coordinate for generate the theoretical trajectory and compare with actual trajectory to compute the final score.   
 
 #### Unused functions:  
 Functions created for temporary testing purpose.
 
-* <code>localization.m</code>
 * <code>mocap_analysis.m</code>
 * <code>mocap_analysis0.m</code>
 
